@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIthena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #16161f;
+    --border: #1e1e2e;
+    --border2: #2a2a3e;
+    --text: #e8e8f0;
+    --text2: #8888a8;
+    --text3: #555570;
+    --accent: #7b6ef6;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --gold: #fbbf24;
+    --red: #f87171;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--accent2); font-style: italic; }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover { color: var(--accent2); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(1.5rem, 8vw, 8rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123, 110, 246, 0.12) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 0.1s forwards;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 0.2s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent2);
+  }
+
+  .hero-sub {
+    max-width: 560px;
+    color: var(--text2);
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 0.3s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.5s ease 0.4s forwards;
+  }
+
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hero-stat-num {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--border2);
+    align-self: center;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 5rem clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 2.5rem;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  /* PAPERS */
+  .paper {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1rem;
+    background: var(--bg2);
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .paper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .paper:hover {
+    border-color: var(--border2);
+    background: var(--bg3);
+  }
+
+  .paper:hover::before { opacity: 1; }
+
+  .paper-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .paper-venue {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .venue-published { background: rgba(52, 211, 153, 0.12); color: var(--green); }
+  .venue-accepted { background: rgba(167, 139, 250, 0.12); color: var(--accent2); }
+  .venue-submitted { background: rgba(251, 191, 36, 0.1); color: var(--gold); }
+  .venue-review { background: rgba(248, 113, 113, 0.1); color: var(--red); }
+
+  .paper-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 0.4rem;
+    flex: 1;
+  }
+
+  .paper-authors {
+    font-size: 0.82rem;
+    color: var(--text2);
+    margin-bottom: 0.5rem;
+  }
+
+  .paper-authors strong { color: var(--text); }
+
+  .paper-desc {
+    font-size: 0.85rem;
+    color: var(--text3);
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+
+  .paper-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .paper-link {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .paper-link:hover { opacity: 0.7; }
+
+  /* PEOPLE */
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+
+  .person-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: var(--bg2);
+    transition: border-color 0.2s;
+  }
+
+  .person-card:hover { border-color: var(--border2); }
+
+  .person-name {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+    color: var(--text);
+  }
+
+  .person-role {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .person-bio {
+    font-size: 0.83rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .person-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .person-links a {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+  }
+
+  .person-links a:hover { color: var(--accent2); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem clamp(1.5rem, 5vw, 4rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--text2);
+  }
+
+  .footer-logo span { color: var(--accent2); font-style: italic; }
+
+  footer p {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  footer a {
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  footer a:hover { color: var(--accent2); }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2.8rem; }
+    .nav-links { display: none; }
+    .paper-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">AI<span>thena</span></a>
+  <ul class="nav-links">
+    <li><a href="#research">Research</a></li>
+    <li><a href="#people">People</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Independent AI Research</div>
+  <h1>Finding hidden<br>structure in <em>complex</em><br>systems.</h1>
+  <p class="hero-sub">AIthena is an independent AI research lab working at the intersection of multimodal learning, computational neuroscience, and reasoning in large language models. We publish peer-reviewed work with no university affiliation.</p>
+  <div class="hero-meta">
+    <div class="hero-stat">
+      <span class="hero-stat-num">6</span>
+      <span class="hero-stat-label">Publications & Submissions</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">3</span>
+      <span class="hero-stat-label">Venues in 2026</span>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">4</span>
+      <span class="hero-stat-label">Researchers</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- RESEARCH -->
+<section id="research">
+  <div class="section-label">Research</div>
+  <h2>Papers & Publications</h2>
+
+  <!-- CVPR -->
+  <div class="paper">
+    <div class="paper-top">
+      <div class="paper-title">Multimodal Unsupervised Discovery of a Candidate Structural-Functional Dissociation Pattern in Alzheimer's MRI</div>
+      <span class="paper-venue venue-published">CVPR 2026</span>
+    </div>
+    <div class="paper-authors"><strong>Poojak Patel</strong>, <strong>Raj Patel</strong></div>
+    <div class="paper-desc">We apply unsupervised multimodal learning to structural MRI data to identify a candidate dissociation pattern between structural and functional neurodegeneration in Alzheimer's disease. Presented at the Workshop on Subtle Visual Computing, CVPR 2026, Denver. Peer-reviewed, published in proceedings.</div>
+    <div class="paper-links">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--green);letter-spacing:0.06em;text-transform:uppercase;">Published in Proceedings</span>
+    </div>
+  </div>
+
+  <!-- biorxiv -->
+  <div class="paper">
+    <div class="paper-top">
+      <div class="paper-title">nNOS Inhibition as a Neuroprotective Target Under Amyloid Beta Oligomer-Induced Toxicity in MC65 and HT22 Cell Lines</div>
+      <span class="paper-venue venue-review">Under Review</span>
+    </div>
+    <div class="paper-authors"><strong>Poojak Patel</strong>, <strong>Raj Patel</strong>, <strong>Raghad Nowar</strong>, <strong>Kirsten Viola</strong>, <strong>William L. Klein</strong></div>
+    <div class="paper-desc">Two years of wet-lab research at Northwestern University's Klein Lab. Investigates nNOS inhibition as a therapeutic strategy against AβO-induced neurotoxicity and TDP-43 mislocalization in MC65 and HT22 cell lines. Manuscript under peer review at Journal of Neuroscience.</div>
+    <div class="paper-links">
+      <a href="https://biorxiv.org/content/10.64898/2026.02.08.704669" class="paper-link" target="_blank">bioRxiv Preprint</a>
+    </div>
+  </div>
+
+  <!-- CCN -->
+  <div class="paper">
+    <div class="paper-top">
+      <div class="paper-title">Arousal as an Unpredictable Dimension: Evidence from THINGS/THINGSplus</div>
+      <span class="paper-venue venue-accepted">CCN 2026</span>
+    </div>
+    <div class="paper-authors"><strong>Poojak Patel</strong>, <strong>Kaustubh Bukkapatnam</strong></div>
+    <div class="paper-desc">Using the THINGS and THINGSplus large-scale object concept databases, we demonstrate that arousal ratings are uniquely resistant to prediction from other perceptual and semantic dimensions — suggesting arousal captures a distinct, poorly understood axis of human object perception. Accepted at Cognitive Computational Neuroscience (CCN) 2026, NYU, August 2026.</div>
+    <div class="paper-links">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--accent2);letter-spacing:0.06em;text-transform:uppercase;">Presenting at NYU, August 2026</span>
+    </div>
+  </div>
+
+  <!-- PAI 1 -->
+  <div class="paper">
+    <div class="paper-top">
+      <div class="paper-title">Beyond Benchmark Performance: A Case for Uncertainty-Preserving AI in Astrophysics</div>
+      <span class="paper-venue venue-submitted">PAI 2026</span>
+    </div>
+    <div class="paper-authors"><strong>Maneth Perera</strong>, <strong>Poojak Patel</strong></div>
+    <div class="paper-desc">AI methods in astrophysics are evaluated almost entirely on predictive accuracy, yet astrophysical measurements are never clean — filtered through imperfect instruments, photon-counting statistics, and observational geometry. We argue for a new standard of scientific trustworthiness: AI systems should be judged not only by prediction quality, but by whether they preserve measurement uncertainty, respect observational limits, and refrain from inventing structure where none is physically justified. Submission #17, PAI 2026.</div>
+    <div class="paper-links">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;">Submitted</span>
+    </div>
+  </div>
+
+  <!-- PAI 2 -->
+  <div class="paper">
+    <div class="paper-top">
+      <div class="paper-title">Corruption Structure Determines Failure Mode in MRI Reconstruction: A Controlled Measurement-Space Analysis</div>
+      <span class="paper-venue venue-submitted">PAI 2026</span>
+    </div>
+    <div class="paper-authors"><strong>Poojak Patel</strong>, <strong>Maneth Perera</strong></div>
+    <div class="paper-desc">Standard evaluation of learning-based MRI reconstruction focuses on random undersampling, leaving open how reconstruction fails under physically realistic measurement perturbations. Using a k-space physics-grounded framework on the fastMRI dataset, we show that corruption structure determines the qualitative character of failure independently of severity. Structured line dropout produces catastrophic collapse (SSIM drop 0.877) while random undersampling produces gradual degradation (0.134) — failure modes that aggregate PSNR evaluation cannot distinguish. Submission #18, PAI 2026.</div>
+    <div class="paper-links">
+      <span style="font-family:var(--mono);font-size:0.65rem;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;">Submitted</span>
+    </div>
+  </div>
+
+</section>
+
+<hr class="divider">
+
+<!-- PEOPLE -->
+<section id="people">
+  <div class="section-label">People</div>
+  <h2>Researchers</h2>
+  <div class="people-grid">
+
+    <div class="person-card">
+      <div class="person-name">Poojak Patel</div>
+      <div class="person-role">Co-founder</div>
+      <div class="person-bio">Researcher at the intersection of multimodal AI, computational neuroscience, and LLM reasoning. Former student researcher at Northwestern's Klein Lab and Google Quantum AI. First-author publications at CVPR 2026 and AIMLSystems 2025.</div>
+      <div class="person-links">
+        <a href="https://patelpoojak.github.io" target="_blank">Website</a>
+        <a href="https://www.linkedin.com/in/patelpoojak/" target="_blank">LinkedIn</a>
+        <a href="https://x.com/patelpoojak" target="_blank">Twitter</a>
+      </div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Raj Patel</div>
+      <div class="person-role">Co-founder</div>
+      <div class="person-bio">Co-author on CVPR 2026 and Journal of Neuroscience submissions. Research focus spans multimodal learning and computational approaches to neuroscience.</div>
+      <div class="person-links">
+        <a href="mailto:aithena.lab@gmail.com">Contact</a>
+      </div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Kaustubh Bukkapatnam</div>
+      <div class="person-role">Researcher</div>
+      <div class="person-bio">Co-author on CCN 2026. Research focus on perceptual dimensions of human object cognition and representational structure in large-scale concept databases.</div>
+    </div>
+
+    <div class="person-card">
+      <div class="person-name">Maneth Perera</div>
+      <div class="person-role">Researcher</div>
+      <div class="person-bio">Co-author on two PAI 2026 submissions. Research focus on physics-informed AI evaluation, uncertainty quantification in astrophysical models, and robustness of learning-based medical imaging pipelines.</div>
+    </div>
+
+  </div>
+</section>
+<section id="contact" style="padding-bottom: 3rem;">
+  <div class="section-label">Contact</div>
+  <h2>Get in touch.</h2>
+  <p style="color:var(--text2); max-width:480px; font-size:0.95rem;">For research inquiries, collaborations, or anything else, reach us at <a href="mailto:aithena.lab@gmail.com" style="color:var(--accent2);">aithena.lab@gmail.com</a></p>
+</section>
+
+<footer>
+  <div class="footer-logo">AI<span>thena</span></div>
+  <p>Independent AI Research · Founded 2025</p>
+  <p><a href="mailto:aithena.lab@gmail.com">aithena.lab@gmail.com</a></p>
+</footer>
+
+</body>
+</html>
